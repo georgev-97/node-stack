@@ -1,38 +1,11 @@
-// import pgPromise from "pg-promise";
-// import { Request, Response } from "express";
-// import Joi from "joi";
+import { Request, Response } from "express";
+import { Planet, Planets } from "../data/planets.js";
+import Joi from "joi";
 
-// const db = pgPromise()("postgres://postgres:postgres@localhost:5432/video");
-// const setupDb = async () => {
-//   await db.none(`
-//         DROP TABLE IF EXISTS planets;
-
-//         CREATE TABLE planets(
-//             id SERIAL NOT NULL PRIMARY KEY,
-//             name TEXT NOT NULL
-//         )
-//     `);
-//   await db.none(`INSERT INTO PLANETS (name) VALUES ('Earth')`);
-//   await db.none(`INSERT INTO PLANETS (name) VALUES ('Mars')`);
-//   console.log("Database created");
-// };
-
-// setupDb();
-
-// const create = (req: Request, res: Response) => {
-//   const { id, name } = req.body;
-//   const newPlanet = { id: id, name: name };
-//   res.status(201).json({ msg: "Planet created" });
-// };
-
-// export {create};
-
-type Planet = {
-  id: number,
-  name: string,
-};
-
-type Planets = Planet[];
+const planetSchema = Joi.object({
+  id: Joi.number().required(),
+  name: Joi.string().required()
+})
 
 let planets: Planets = [
   {
@@ -44,3 +17,44 @@ let planets: Planets = [
     name: "Mars",
   },
 ];
+
+const getAll = (req: Request, res: Response) => {
+  res.status(200).json(planets);
+};
+
+const getPlanetById = (req: Request, res: Response) => {
+  const { id } = req.params;
+  const planet: Planet | undefined = planets.find((p) => p.id == Number(id));
+  res.status(200).json(planet);
+};
+
+const create = (req: Request, res: Response) => {
+  const { id, name } = req.body;
+  const newPlanet = { id: id, name: name };
+  const validation = planetSchema.validate(newPlanet);
+  if(validation.error){
+    return res.status(400).json({msg: validation.error.details[0].message})
+  }
+    planets = [...planets, validation.value];
+    res.status(201).json({msg: "Planet created"})
+};
+
+const updatePlanetById = (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { name } = req.body;
+
+  planets = planets.map((planet) =>
+    planet.id === Number(id) ? { ...planet, name } : planet
+  );
+
+  res.status(200).json({msg: "Planet updated"});
+};
+
+const deletePlanetById = (req: Request, res: Response) => {
+  const { id } = req.params;
+  planets.filter((planet) => planet.id !== Number(id));
+
+  res.status(200).json({msg: "Planet deleted"});
+};
+
+export { getAll, getPlanetById, create, updatePlanetById, deletePlanetById };
