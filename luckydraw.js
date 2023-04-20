@@ -16,24 +16,28 @@ function luckyDraw(player) {
   });
 }
 
-const players = ["Joe", "Caroline", "Sabrina"];
+const players = ["Tina", "Jorge", "Julien"];
 
-// players.forEach(player => {
-//     luckyDraw(player).then(console.log).catch(console.log);
-// })
 
-luckyDraw(players[0])
-  .then((res) => {
-    console.log(res);
-  })
-  .then(
-    luckyDraw(players[1]).then((res) => {
-      console.log(res);
-    })
-  )
-  .then(
-    luckyDraw(players[2]).then((res) => {
-      console.log(res);
-    })
-  )
-  .catch((error) => console.log(error));
+async function getResults(){
+    try{
+        const a = await luckyDraw(players[0]);
+        console.log(a)
+    }catch(error){
+        console.log(error);
+    }
+    try{
+        const b = await luckyDraw(players[1]);
+        console.log(b)
+    }catch(error){
+        console.log(error);
+    }
+    try{
+        const c = await luckyDraw(players[2]);
+        console.log(c)
+    }catch(error){
+        console.log(error);
+    }
+}
+
+getResults();
