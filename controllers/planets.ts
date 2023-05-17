@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import Joi from "joi";
 import pgPromise from "pg-promise"
 
-const db = pgPromise({})("postgres://postgres:gonalia@localhost:5432/crypto")
+const db = pgPromise({})("postgres://postgres:postgres@localhost:5432/crypto")
 
 
 const setupDb = async () => {
